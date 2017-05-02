@@ -4,6 +4,97 @@ let attempt = document.getElementById('attempt');
 function guess() {
     let input = document.getElementById('user-guess');
     //add functionality to guess function here
+
+    // #8 Only set the answer and attempt hidden inputs when they aren't already set
+    if(answer.value === '' && attempt.value === '') {
+      setHiddenFields();
+    }
+
+    // #11 Call the validateInput function from the guess function
+    if(!validateInput(input.value)) {
+      return;
+    }
+    attempt.value++;
+
+    //#14 Setup Win Condition
+    if(getResults(input.value)){
+      setMessage("You Win! :)")
+      // #19 Add showAnswer and showReplay to Win / Lose Conditions
+      showAnswer(true)
+      showReplay()
+    } else if(attempt.value >= 10) {
+      setMessage("You Lose! :(")
+      // #19 Add showAnswer and showReplay to Win / Lose Conditions
+      showAnswer(false)
+      showReplay()
+    } else {
+      setMessage("Incorrect, try again.")
+    }
 }
 
 //implement new functions here
+
+// #7 Set the hidden input attempt's value to zero
+function setHiddenFields() {
+
+  answer.value = Math.floor(Math.random() * 10000).toString(); 
+  while(answer.value.length < 4) {
+      answer.value = "0" + answer.value;
+  }
+  attempt.value = "0";
+}
+
+// #9 Create setMessage function
+function setMessage(message){
+  document.getElementById('message').innerHTML = message;
+}
+
+// #10 Create validateInput function
+function validateInput(input) {
+  if(input.length != 4){
+    setMessage("Guesses must be exactly 4 characters long.")
+    return false;
+  }
+  return true;
+}
+
+// #12 Create getResults function
+function getResults(input){
+  let html = '<div class="row"><span class="col-md-6">' + input + '</span><div class="col-md-6">';
+  for(i = 0; i < input.length; i++) {
+    if(input.charAt(i) == answer.value.charAt(i)) {
+      html += '<span class="glyphicon glyphicon-ok"></span>';
+    } else if(answer.value.indexOf(input.charAt(i)) > -1 ) {
+      html += '<span class="glyphicon glyphicon-transfer"></span>';
+    } else {
+      html += '<span class="glyphicon glyphicon-remove"></span>';
+    }
+  }
+
+  html += '</div></div>';
+  document.getElementById('results').innerHTML += html
+
+  //#13 Check for correct guess
+  if(input == answer.value) {
+    return true;
+  }
+  return false;
+}
+
+// #17 Create a showAnswer function
+function showAnswer(success) {
+  let code = document.getElementById('code')
+  if(success) {
+    code.className += ' success';
+  } else {
+    code.className += ' failure';
+  }
+
+  code.innerHTML = answer.value;
+}
+
+// #18 Create a showReplay function
+function showReplay() {
+  document.getElementById('guessing-div').style.display = 'none';
+  document.getElementById('replay-div').style.display = 'block';
+}
